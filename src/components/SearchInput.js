@@ -2,7 +2,10 @@ import React from "react";
 import { StyleSheet, TextInput, View } from "react-native";
 
 class SearchInput extends Component {
-  state = {};
+  handleChangeText = newLocation => {
+    this.props.location = newLocation;
+  };
+
   render() {
     return (
       <View style={styles.container}>
@@ -13,6 +16,7 @@ class SearchInput extends Component {
           underlineColorAndroid="transparent"
           style={styles.textInputSearch}
           clearButtonMode="always"
+          onChangeText={this.handleChangeText}
         />
       </View>
     );

@@ -14,16 +14,16 @@ import SearchInput from "./src/components/SearchInput";
 
 export default class App extends Component {
   render() {
+    const location = "San Francisco";
     return (
-      <KeyboardAvoidingView style={styles.container}>
+      <KeyboardAvoidingView style={styles.container} behavior="padding">
         <ImageBackground
-          source={getImageForWeather("clear")}
+          source={getImageForWeather("Clear")}
           style={styles.imageContainer}
+          imageStyle={styles.image}
         >
           <View style={styles.detailsContainer}>
-            <Text style={[styles.largeText, styles.textStyle]}>
-              San Francisco
-            </Text>
+            <Text style={[styles.largeText, styles.textStyle]}>{location}</Text>
             <Text style={[styles.smallText, styles.textStyle]}>
               Light Cloud
             </Text>
@@ -40,13 +40,12 @@ export default class App extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center"
+    backgroundColor: "#34495E"
   },
   textStyle: {
     textAlign: "center",
-    fontFamily: Platform.OS === "ios" ? "AvenirNext-Regular" : "Roboto"
+    fontFamily: Platform.OS === "ios" ? "AvenirNext-Regular" : "Roboto",
+    color: "white"
   },
   largeText: {
     fontSize: 44
@@ -54,6 +53,19 @@ const styles = StyleSheet.create({
   smallText: {
     fontSize: 18
   },
-  imageContainer: {},
-  detailsContainer: {}
+  imageContainer: {
+    flex: 1
+  },
+  image: {
+    flex: 1,
+    width: null,
+    height: null,
+    resizeMode: "cover"
+  },
+  detailsContainer: {
+    flex: 1,
+    justifyContent: "center",
+    backgroundColor: "rgba( 0, 0, 0, 0.2 )",
+    paddingHorizontal: 20
+  }
 });
