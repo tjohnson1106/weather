@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Component } from "react";
 import { StyleSheet, TextInput, View } from "react-native";
 
 class SearchInput extends Component {
@@ -11,6 +11,18 @@ class SearchInput extends Component {
 
   handleChangeText = text => {
     this.setState({ text });
+  };
+
+  handleSubmitEditing = () => {
+    const { onSubmit } = this.props;
+    const { text } = this.props;
+
+    if (!text) return;
+
+    onSubmit(text);
+    this.setState({
+      text: ""
+    });
   };
 
   render() {

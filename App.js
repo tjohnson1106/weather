@@ -8,30 +8,47 @@ import {
   View
 } from "react-native";
 
+import SearchInput from "./src/components/SearchInput";
 import getImageForWeather from "./utils/getImageForWeather";
 
-import SearchInput from "./src/components/SearchInput";
-
 export default class App extends Component {
+  super(props) {
+    constructor(props);
+
+    this.state = {
+      location: "San Francisco"
+    };
+  }
+
+  componentDidMount() {
+    console.log("Component has mounted");
+  }
+
+  handleUpdateLocation = city => {
+    this.setState({
+      location: city
+    });
+  };
+
   render() {
-    const location = "San Francisco";
+    const { location } = this.state;
     return (
       <KeyboardAvoidingView style={styles.container} behavior="padding">
         <ImageBackground
-          source={getImageForWeather("Clear")}
+          source={getImageForWeather}
           style={styles.imageContainer}
           imageStyle={styles.image}
-        >
-          <View style={styles.detailsContainer}>
-            <Text style={[styles.largeText, styles.textStyle]}>{location}</Text>
-            <Text style={[styles.smallText, styles.textStyle]}>
-              Light Cloud
-            </Text>
-            <Text style={[styles.largeText, styles.textStyle]}>24°</Text>
+        />
+        <View style={styles.detailsContainer}>
+          <Text style={[styles.largeText, styles.textStyle]}>{location}</Text>
+          <Text style={[styles.smallText, styles.textStyle]}>{location}</Text>
+          <Text style={[styles.largeText, styles.textStyle]}>{location}</Text>
 
-            <SearchInput placeholder="Search any city" />
-          </View>
-        </ImageBackground>
+          <SearchInput
+            placeholder="Search any city"
+            onSubmit={this.handleUpdateLocation}
+          />
+        </View>
       </KeyboardAvoidingView>
     );
   }
@@ -44,8 +61,7 @@ const styles = StyleSheet.create({
   },
   textStyle: {
     textAlign: "center",
-    fontFamily: Platform.OS === "ios" ? "AvenirNext-Regular" : "Roboto",
-    color: "white"
+    fontFamily: Platform.OS === "ios" ? "AvenirNext-Regular" : "Roboto"
   },
   largeText: {
     fontSize: 44
