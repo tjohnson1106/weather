@@ -1,54 +1,108 @@
-import React, { Component } from "react";
+import React from "react";
 import {
   StyleSheet,
   Text,
-  KeyboardAvoidingView,
   Platform,
+  KeyboardAvoidingView,
   ImageBackground,
-  View
+  View,
+  ActivityIndicator,
+  StatusBar
 } from "react-native";
 
-import SearchInput from "./src/components/SearchInput";
 import getImageForWeather from "./utils/getImageForWeather";
+import { fetchLocationId, fetchWeather } from "./utils/api";
 
-export default class App extends Component {
-  super(props) {
-    constructor(props);
+import SearchInput from "./src/components/SearchInput";
 
-    this.state = {
-      location: "San Francisco"
-    };
-  }
+export default class App extends React.Component {
+  state = {
+    loading: false,
+    error: false,
+
+    location: "",
+    temperature: 0,
+    weather: ""
+  };
 
   componentDidMount() {
-    console.log("Component has mounted");
+    this.handleUpdateLocation("San Francisco");
   }
 
-  handleUpdateLocation = city => {
-    this.setState({
-      location: city
+  handleUpdateLocation = async city => {
+    if (!city) return;
+
+    this.setState({ loading: true }, async () => {
+      try {
+        const locationID = await fetchLocationId(city);
+        const { location, weather, temperature } = await fetchWeather(locationID);
+
+        this.setState({
+          loading: false,
+          error: false,
+          location,
+          temperature,
+          weather
+        });
+      } catch (e) {
+        console.log(e);
+
+        this.setState({
+          loading: false,
+          error: true
+        });
+      }
     });
   };
 
   render() {
-    const { location } = this.state;
     return (
       <KeyboardAvoidingView style={styles.container} behavior="padding">
+        <StatusBar barStyle="light-content" />
         <ImageBackground
-          source={getImageForWeather}
+          source={getImageForWeather(this.state.weather)}
           style={styles.imageContainer}
           imageStyle={styles.image}
-        />
-        <View style={styles.detailsContainer}>
-          <Text style={[styles.largeText, styles.textStyle]}>{location}</Text>
-          <Text style={[styles.smallText, styles.textStyle]}>{location}</Text>
-          <Text style={[styles.largeText, styles.textStyle]}>{location}</Text>
+        >
+          <View style={styles.detailsContainer}>
+            <ActivityIndicator
+              animating={this.state.loading}
+              color="white"
+              size="large"
+            />
 
-          <SearchInput
-            placeholder="Search any city"
-            onSubmit={this.handleUpdateLocation}
-          />
-        </View>
+            {!this.state.loading && (
+              <View>
+                {this.state.error && (
+                  <Text style={[styles.smallText, styles.textStyle]}>
+                    Could not load weather, please try a different city.
+                  </Text>
+                )}
+
+                {!this.state.error && (
+                  <View>
+                    <Text style={[styles.textStyle, styles.largeText]}>
+                      {this.state.location}
+                    </Text>
+                    <Text style={[styles.textStyle, styles.smallText]}>
+                      {this.state.weather}
+                    </Text>
+                    {/* why do these braces do anything around Math.round? */}
+                    <Text style={[styles.textStyle, styles.largeText]}>{`${Math.round(
+                      this.state.temperature * (9 / 5) + 32
+                    )}° F`}</Text>
+                  </View>
+                )}
+
+                <SearchInput
+                  location={this.state.location}
+                  placeholder="Search any City"
+                  onSubmit={this.handleUpdateLocation}
+                />
+              </View>
+            )}
+          </View>
+        </ImageBackground>
       </KeyboardAvoidingView>
     );
   }
@@ -57,11 +111,14 @@ export default class App extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#34495E"
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center"
   },
   textStyle: {
     textAlign: "center",
-    fontFamily: Platform.OS === "ios" ? "AvenirNext-Regular" : "Roboto"
+    fontFamily: Platform.OS === "ios" ? "AvenirNext-Regular" : "Roboto",
+    color: "white"
   },
   largeText: {
     fontSize: 44
@@ -72,6 +129,10 @@ const styles = StyleSheet.create({
   imageContainer: {
     flex: 1
   },
+  container: {
+    flex: 1,
+    backgroundColor: "#34495E"
+  },
   image: {
     flex: 1,
     width: null,
@@ -81,7 +142,7 @@ const styles = StyleSheet.create({
   detailsContainer: {
     flex: 1,
     justifyContent: "center",
-    backgroundColor: "rgba( 0, 0, 0, 0.2 )",
+    backgroundColor: "rgba(0, 0, 0, .2)",
     paddingHorizontal: 20
   }
 });
